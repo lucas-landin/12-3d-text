@@ -78,19 +78,6 @@ fontLoader.load(
  * Objects
  */
 
-const donuts = []; // Array to store all the donuts
-
-
- const donutGeometry = new THREE.TorusGeometry(0.3, 0.2, 20, 45)
- const donutMaterial = new THREE.MeshMatcapMaterial({ matcap: matcapTexture })
- 
- for(let i = 0; i < 40; i++)
-{
-    const donut = createRandomMesh(donutGeometry, donutMaterial)
-    donuts.push(donut);
-    
-}
-
     function createRandomMesh(geometry, material) {
         const mesh = new THREE.Mesh(geometry, material);
 
@@ -109,12 +96,27 @@ const donuts = []; // Array to store all the donuts
         return mesh;
     }
 
+
+    const donuts = []; // Array to store all the donuts
+
+
+    const donutGeometry = new THREE.TorusGeometry(0.3, 0.2, 20, 45)
+    const donutMaterial = new THREE.MeshMatcapMaterial({ matcap: matcapTexture })
+    
+    for(let i = 0; i < 60; i++)
+    {
+        const donut = createRandomMesh(donutGeometry, donutMaterial)
+        donuts.push(donut);
+        
+    }
+
+   
     const cubeGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
     const cubeMaterial = new THREE.MeshMatcapMaterial({ matcap: matcapTexture });
 
     const cubes = [];
 
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 60; i++) {
         const cube = createRandomMesh(cubeGeometry, cubeMaterial);
         cubes.push(cube);
     }
@@ -124,155 +126,155 @@ const donuts = []; // Array to store all the donuts
 
     const pyramids = [];
 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 50; i++) {
         const pyramid = createRandomMesh(pyramidGeometry, pyramidMaterial);
         pyramids.push(pyramid);
     }
 
-/**
- * Enviroment map
- */
-const rgbeLoader = new RGBELoader()
-rgbeLoader.load('./textures/environmentMap/estrela.hdr', (environmentMap) =>
-{
-    environmentMap.mapping = THREE.EquirectangularReflectionMapping
+    /**
+     * Enviroment map
+     */
+    const rgbeLoader = new RGBELoader()
+    rgbeLoader.load('./textures/environmentMap/estrela.hdr', (environmentMap) =>
+    {
+        environmentMap.mapping = THREE.EquirectangularReflectionMapping
 
-    scene.background = environmentMap
-    scene.environment = environmentMap
-})
+        scene.background = environmentMap
+        scene.environment = environmentMap
+    })
 
 
-/**
- * Sizes
- */
-const sizes = {
-    width: window.innerWidth,
-    height: window.innerHeight
-}
+    /**
+     * Sizes
+     */
+    const sizes = {
+        width: window.innerWidth,
+        height: window.innerHeight
+    }
 
-window.addEventListener('resize', () =>
-{
-    // Update sizes
-    sizes.width = window.innerWidth
-    sizes.height = window.innerHeight
+    window.addEventListener('resize', () =>
+    {
+        // Update sizes
+        sizes.width = window.innerWidth
+        sizes.height = window.innerHeight
 
-    // Update camera
-    camera.aspect = sizes.width / sizes.height
-    camera.updateProjectionMatrix()
+        // Update camera
+        camera.aspect = sizes.width / sizes.height
+        camera.updateProjectionMatrix()
 
-    // Update renderer
+        // Update renderer
+        renderer.setSize(sizes.width, sizes.height)
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    })
+
+    /**
+     * Camera
+     */
+    // Base camera
+    const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
+    camera.position.x = 1
+    camera.position.y = 1
+    camera.position.z = 4
+    scene.add(camera)
+
+    /**
+     * Camera movement along a semicircle
+     */
+
+    // const radius = 4; // Raio do semicírculo
+    // let angle = 0; // Ângulo inicial
+
+    // const updateCameraPosition = () => {
+    //     // Movimento ao longo do semicírculo
+    //     const x = Math.sin(angle) * radius;
+    //     const z = Math.cos(angle) * radius;
+
+    //     // Ajusta a posição da câmera
+    //     camera.position.set(x, 1, z);
+
+    //     // Olha para o centro da cena
+    //     camera.lookAt(scene.position);
+    // };
+
+
+
+
+    // Defina os limites de distância para o zoom
+    const minZoomDistance = 2; // Distância mínima (zoom máximo)
+    const maxZoomDistance = 10; // Distância máxima (zoom mínimo)
+
+
+
+    // Controls
+    const controls = new OrbitControls(camera, canvas)
+    controls.enableDamping = true
+
+    // Aplica os limites de distância aos controles
+    controls.minDistance = minZoomDistance;
+    controls.maxDistance = maxZoomDistance;
+
+
+    // Define os limites de rotação horizontal (azimute)
+    const minAzimuthAngle = -Math.PI / 8; // Ângulo mínimo
+    const maxAzimuthAngle = Math.PI / 8; // Ângulo máximo
+
+    // Aplica os limites aos controles
+    controls.minAzimuthAngle = minAzimuthAngle;
+    controls.maxAzimuthAngle = maxAzimuthAngle;
+
+    const minPolarAngle = Math.PI / 2; // Ângulo mínimo
+    const maxPolarAngle = (2 * Math.PI) /4; // Ângulo máximo
+
+    // Aplica os limites aos controles
+    controls.minPolarAngle = minPolarAngle;
+    controls.maxPolarAngle = maxPolarAngle;
+
+
+    /**
+     * Renderer
+     */
+    const renderer = new THREE.WebGLRenderer({
+        canvas: canvas
+    })
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-})
 
-/**
- * Camera
- */
-// Base camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.x = 1
-camera.position.y = 1
-camera.position.z = 4
-scene.add(camera)
+    /**
+     * Animate
+     */
+    const clock = new THREE.Clock()
 
-/**
- * Camera movement along a semicircle
- */
+    const tick = () =>
+    {
 
-// const radius = 4; // Raio do semicírculo
-// let angle = 0; // Ângulo inicial
+        //  // Atualiza o ângulo para mover ao longo do semicírculo
+        // angle += 0.002;
 
-// const updateCameraPosition = () => {
-//     // Movimento ao longo do semicírculo
-//     const x = Math.sin(angle) * radius;
-//     const z = Math.cos(angle) * radius;
+        // // Atualiza a posição da câmera ao longo do semicírculo
+        // updateCameraPosition();
 
-//     // Ajusta a posição da câmera
-//     camera.position.set(x, 1, z);
+        const elapsedTime = clock.getElapsedTime()
 
-//     // Olha para o centro da cena
-//     camera.lookAt(scene.position);
-// };
+        donuts.forEach((donut) => {
+            donut.rotation.x = 0.5 * elapsedTime
+        })
 
+        cubes.forEach((cube) => {
+            cube.rotation.z = 0.5 * elapsedTime
+        })
 
+        pyramids.forEach((pyramid) => {
+            pyramid.rotation.y = 0.5 * elapsedTime
+        })
 
+        // Update controls
+        controls.update()
 
-// Defina os limites de distância para o zoom
-const minZoomDistance = 2; // Distância mínima (zoom máximo)
-const maxZoomDistance = 10; // Distância máxima (zoom mínimo)
+        // Render
+        renderer.render(scene, camera)
 
+        // Call tick again on the next frame
+        window.requestAnimationFrame(tick)
+    }
 
-
-// Controls
-const controls = new OrbitControls(camera, canvas)
-controls.enableDamping = true
-
-// Aplica os limites de distância aos controles
-controls.minDistance = minZoomDistance;
-controls.maxDistance = maxZoomDistance;
-
-
-// Define os limites de rotação horizontal (azimute)
-const minAzimuthAngle = -Math.PI / 8; // Ângulo mínimo
-const maxAzimuthAngle = Math.PI / 8; // Ângulo máximo
-
-// Aplica os limites aos controles
-controls.minAzimuthAngle = minAzimuthAngle;
-controls.maxAzimuthAngle = maxAzimuthAngle;
-
-const minPolarAngle = Math.PI / 2; // Ângulo mínimo
-const maxPolarAngle = (2 * Math.PI) /4; // Ângulo máximo
-
-// Aplica os limites aos controles
-controls.minPolarAngle = minPolarAngle;
-controls.maxPolarAngle = maxPolarAngle;
-
-
-/**
- * Renderer
- */
-const renderer = new THREE.WebGLRenderer({
-    canvas: canvas
-})
-renderer.setSize(sizes.width, sizes.height)
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-
-/**
- * Animate
- */
-const clock = new THREE.Clock()
-
-const tick = () =>
-{
-
-    //  // Atualiza o ângulo para mover ao longo do semicírculo
-    // angle += 0.002;
-
-    // // Atualiza a posição da câmera ao longo do semicírculo
-    // updateCameraPosition();
-
-    const elapsedTime = clock.getElapsedTime()
-
-    donuts.forEach((donut) => {
-        donut.rotation.x = 0.5 * elapsedTime
-    })
-
-    cubes.forEach((cube) => {
-        cube.rotation.z = 0.5 * elapsedTime
-    })
-
-    pyramids.forEach((pyramid) => {
-        pyramid.rotation.y = 0.5 * elapsedTime
-    })
-
-    // Update controls
-    controls.update()
-
-    // Render
-    renderer.render(scene, camera)
-
-    // Call tick again on the next frame
-    window.requestAnimationFrame(tick)
-}
-
-tick()
+    tick()
